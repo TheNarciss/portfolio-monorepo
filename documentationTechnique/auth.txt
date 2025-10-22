@@ -1,0 +1,113 @@
+backend/app/core/security.py
+
+Variables :
+
+SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES → depuis .env
+
+oauth2_scheme → FastAPI OAuth2PasswordBearer pour sécuriser les endpoints
+
+Fonctions :
+
+create_access_token(data: dict, expires_delta: Optional[timedelta]) -> str
+→ Génère un JWT pour l’utilisateur.
+
+decode_access_token(token: str) -> dict
+→ Décode le JWT et retourne le payload.
+
+get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> UserRead
+→ Vérifie le token et retourne l’utilisateur connecté.
+
+Objet de sécurité :
+
+pwd_context → PassLib context pour hasher et vérifier les mots de passe.
+
+backend/app/crud/user.py
+
+Fonctions :
+
+get_user_by_email(db: Session, email: str) -> User | None
+→ Récupère un utilisateur par email.
+
+create_user(db: Session, user: UserCreate, hashed_password: str, is_admin=False) -> User
+→ Crée un utilisateur avec le mot de passe hashé et option admin.
+
+backend/app/schemas/user.py
+
+Pydantic Models :
+
+UserBase → email seulement
+
+UserCreate → email + password
+
+UserRead → id, email, is_active, is_admin, created_at, updated_at (avec model_config["from_attributes"] = True pour ORM)
+
+backend/app/api/v1/endpoints/auth.py
+
+Endpoints :
+
+POST /signup → créer un utilisateur, hash du mot de passe inclus
+
+POST /login → vérifier identifiants, retourne JWT
+
+GET /me → retourne l’utilisateur connecté (Depends(get_current_user))
+
+🔹 Flux général de l’auth
+
+Signup → hash password → create_user
+
+Login → vérifier password avec pwd_context.verify → créer JWT avec create_access_token
+
+Protected routes → Depends(get_current_user) → decode JWT → retourne UserRead
+
+-------------------------------------------------------------------------------------------------------------------
+
+Amélioration pour la suite : 
+
+
+1️⃣ Gestion des secrets et sécurité
+
+✅ Les secrets (SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES) sont dans .env → bien.
+
+⚠️ Amélioration possible : utiliser un gestionnaire de secrets (Vault, AWS Secrets Manager, etc.) pour les environnements prod.
+
+⚠️ Clé secrète : s’assurer qu’elle est longue et aléatoire, pas juste une chaîne fixe.
+
+2️⃣ Password hashing
+
+✅ bcrypt via pwd_context → correct.
+
+⚠️ Amélioration possible : augmenter le nombre de rounds si nécessaire pour renforcer la sécurité, surtout si c’est prod.
+
+3️⃣ JWT / Token Management
+
+✅ python-jose avec expiration → correct.
+
+⚠️ Amélioration possible : ajouter refresh tokens pour ne pas forcer un login tous les 30 min, surtout si tu veux un site plus sérieux.
+
+⚠️ Pour les endpoints sensibles, envisager roles/permissions plutôt qu’un simple is_admin.
+
+4️⃣ Structure du code
+
+✅ Séparation crud, schemas, models, api → bonne pratique.
+
+⚠️ Amélioration possible : créer un module services pour encapsuler certaines logiques métiers (ex: création d’utilisateur + envoi d’email de bienvenue).
+
+5️⃣ Gestion des erreurs et retours
+
+✅ HTTPException avec status code → correct.
+
+⚠️ Amélioration possible : créer des classes d’erreurs centralisées ou des réponses standardisées (ex: {"error": "...", "code": ...}) pour uniformiser l’API.
+
+6️⃣ Tests
+
+⚠️ Non fait pour l’instant : ajouter des tests unitaires et tests d’intégration pour :
+
+signup/login
+
+accès aux endpoints protégés
+
+création d’utilisateur admin/non-admin
+
+7️⃣ Logging / Monitoring
+
+⚠️ Pour la prod : ajouter un système de logs centralisé et de monitoring pour détecter les tentatives de connexion suspectes.

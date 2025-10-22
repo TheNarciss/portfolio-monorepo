@@ -1,0 +1,29 @@
+# Serveur FastAPI
+fastapi
+uvicorn[standard]
+
+# Base de données et ORM
+SQLAlchemy
+alembic
+psycopg2-binary
+
+# Validation et parsing
+pydantic
+pydantic-settings
+# Sécurité et auth
+python-jose
+passlib
+bcrypt==4.0.1
+python-dotenv
+
+# Gestion CORS et formulaires pour frontend
+python-multipart
+python-dotenv
+fastapi-cors
+
+# Emails
+email-validator
+
+# Dev / tests
+pytest
+httpx

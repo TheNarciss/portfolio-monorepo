@@ -1,0 +1,115 @@
+# Frontend Portfolio - Documentation des fichiers et structure
+
+## 1. Dossier src/
+Structure principale du frontend.
+
+---
+
+### 1.1 src/main.tsx
+- **Méthode/techno** : Entrée React, rendu avec `ReactDOM.createRoot`
+- **Utilité** : Monte l'application React dans l'élément HTML root
+- **Technologies** : React 18, TypeScript
+
+---
+
+### 1.2 src/App.tsx
+- **Méthode/techno** : React Router v7, layout principal
+- **Utilité** : Définit le routing global, layout avec Navbar et Footer
+- **Technologies** : React Router, TailwindCSS
+
+---
+
+### 1.3 src/components/
+Contient tous les composants réutilisables.
+
+- **Navbar.tsx** : barre de navigation fixe avec liens vers toutes les pages.
+- **Footer.tsx** : pied de page global.
+- **Card.tsx** : composant réutilisable pour afficher projet, expérience, formation.
+- **SectionTitle.tsx** : titre de section avec style cohérent.
+
+**Techno** : React, TailwindCSS, Framer Motion (animations)
+
+---
+
+### 1.4 src/pages/
+Pages principales du portfolio.
+
+- **Home.tsx** : page d'accueil avec hero section et présentation.
+- **Projects.tsx** : affiche la liste des projets récupérés via API.
+- **Education.tsx** : affiche les formations.
+- **Experience.tsx** : affiche les expériences professionnelles.
+- **Skills.tsx** : grille des compétences.
+- **Contact.tsx** : formulaire de contact.
+
+**Méthode** : `useEffect` + `useState` pour fetch des données depuis l’API, affichage via composants Card.  
+**Techno** : React, TypeScript, TailwindCSS, Framer Motion.
+
+---
+
+### 1.5 src/api/
+Contient les services pour appels API.
+
+- **apiClient.ts** : instance Axios configurée avec baseURL et interceptor pour JWT.
+- **projects.ts / education.ts / experience.ts / skills.ts / contact.ts** : fonctions CRUD typées TS pour chaque entité.
+
+**Méthode** : Axios avec typage TS, gestion JWT automatique.  
+**Utilité** : centraliser tous les appels API pour frontend.  
+**Techno** : Axios, TypeScript
+
+---
+
+### 1.6 src/context/
+Contient les contexts React pour gérer le state global.
+
+- **AuthContext.tsx** :
+  - Stocke l’utilisateur connecté et le JWT.
+  - Méthodes : login, signup, logout, fetchCurrentUser.
+  - Gestion des routes protégées.
+  
+**Méthode** : React Context + Hooks, typé TypeScript  
+**Techno** : React, TypeScript
+
+---
+
+### 1.7 src/hooks/
+Contient des hooks personnalisés réutilisables.
+
+- **useFetch.ts** : hook générique pour fetcher des données et gérer loading / error states.  
+**Techno** : React Hooks, TypeScript
+
+---
+
+### 1.8 src/components/PrivateRoute.tsx
+- **Méthode** : wrapper pour protéger les routes React Router.
+- **Utilité** : vérifie si l’utilisateur est connecté et éventuellement admin.
+- **Techno** : React Router, React Context
+
+---
+
+### 1.9 src/assets/
+- Contient les images, logos et autres fichiers statiques du frontend.
+
+---
+
+## 2. Technologies principales utilisées
+- **React 18 + TypeScript** : frontend type-safe et moderne
+- **TailwindCSS** : design responsive et utilitaire
+- **Framer Motion** : animations fluides
+- **React Router v7** : routing SPA
+- **Axios** : appels API REST typés
+- **JWT Auth** : sécurisation routes et interactions backend
+
+---
+
+## 3. Bonnes pratiques prod mises en place
+- Typage strict TypeScript (`strict: true`)
+- Context pour auth et token management
+- API centralisée avec interceptors
+- Composants réutilisables
+- Lazy loading possible pour pages lourdes
+- Routes protégées via `PrivateRoute`
+- Design responsive et animations
+
+---
+
+Fin du document

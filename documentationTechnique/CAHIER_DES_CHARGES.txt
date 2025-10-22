@@ -1,0 +1,111 @@
+🧾 CAHIER DES CHARGES — PORTFOLIO MONOREPO
+🏗️ 1. Objectif du projet
+
+Développer une application portfolio fullstack permettant :
+
+d’afficher dynamiquement les projets (titre, description, stack, image, lien GitHub ou démo)
+
+de gérer un formulaire de contact (nom, email, message)
+
+d’avoir une interface d’administration pour gérer les projets et messages
+
+d’être déployée sur un environnement conteneurisé (Docker)
+
+⚙️ 2. Architecture globale
+Monorepo :
+portfolio-monorepo/
+│
+├── frontend/  → React + Tailwind + Vite
+└── backend/   → FastAPI + SQLAlchemy + PostgreSQL
+
+Frontend :
+
+Framework : React 19 + Vite
+
+CSS : TailwindCSS + classe personnalisée .glass
+
+Authentification : via backend JWT
+
+Composants : Login, Dashboard, ProjectCard, ContactForm, ErrorModal, Toast
+
+Backend :
+
+Framework : FastAPI
+
+ORM : SQLAlchemy
+
+Migrations : Alembic
+
+Authentification : JWT avec python-jose
+
+Hashage : passlib[bcrypt]
+
+Envoi d’e-mails : via SMTP (configurable dans .env)
+
+Base de données : PostgreSQL
+
+🧩 3. Fonctionnalités Backend
+Module	Description	Statut
+core/config.py	Charger les variables d’environnement et initialiser la configuration globale	⬜
+core/security.py	Fonctions de hashage, génération/validation de tokens JWT	⬜
+db/session.py	Initialisation de la session SQLAlchemy	⬜
+models/	Tables Project, Contact, User	⬜
+schemas/	Schémas Pydantic pour validation et réponses API	⬜
+crud/	Fonctions CRUD (create, read, update, delete) pour chaque modèle	⬜
+api/v1/endpoints/	Routes : /projects, /contact, /auth	⬜
+email_service.py	Envoi de mail via SMTP	⬜
+auth/	Authentification (login, signup, reset password)	⬜
+🧱 4. Fonctionnalités Frontend
+Composant / Page	Description	Statut
+App.tsx	Gestion des routes principales	⬜
+pages/Home.tsx	Page d’accueil avec présentation + projets	⬜
+pages/Login.tsx	Connexion admin	⬜
+pages/Dashboard.tsx	Gestion projets + contacts	⬜
+components/ContactForm.tsx	Formulaire de contact avec validation	⬜
+components/ProjectCard.tsx	Affichage stylisé d’un projet	⬜
+components/ErrorModal.tsx	Pop-up d’erreur custom	✅ (déjà existant)
+context/useUser.tsx	Gestion de l’état utilisateur + JWT	⬜
+🧰 5. Fichiers de configuration
+Fichier	Rôle	Statut
+.env	Variables d’environnement (DB, SMTP, JWT_SECRET, FRONTEND_URL)	⬜
+Dockerfile	Build du backend FastAPI	✅
+docker-compose.yml	Coordination entre PostgreSQL, backend, frontend	⬜
+alembic.ini	Config des migrations	⬜
+requirements.txt	Dépendances backend (versions valides)	✅
+package.json	Dépendances frontend	✅
+🧪 6. Tests à prévoir
+Type	Outil	Description
+Tests unitaires	Pytest	Vérifier CRUD + routes
+Tests e2e	Playwright / Cypress	Vérifier parcours utilisateur (frontend)
+Tests intégration	HTTPX	Tester API depuis le backend
+🧭 7. Ordre de développement
+
+✅ Créer l’environnement Python et installer les dépendances backend
+
+✅ Configurer FastAPI (main.py, CORS, app)
+
+⚙️ Créer les fichiers de base (config.py, security.py, session.py)
+
+🧱 Créer les modèles et schémas (models/, schemas/)
+
+🔄 Implémenter les CRUDs (crud/)
+
+🌐 Créer les routes (api/v1/endpoints/)
+
+✉️ Ajouter l’envoi d’e-mails (email_service.py)
+
+🔑 Ajouter l’authentification (auth/)
+
+🧩 Connecter le frontend
+
+🧪 Écrire les tests et documenter
+
+🚀 8. Déploiement cible
+
+Docker Compose : backend + frontend + db
+
+Mode prod : Uvicorn + Gunicorn
+
+Environnement : .env.production
+
+Optionnel : Nginx reverse proxy
