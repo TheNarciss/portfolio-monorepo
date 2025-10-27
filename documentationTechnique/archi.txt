@@ -1,122 +1,194 @@
 portfolio-monorepo/
 │
-├── 📂 backend/                          
+├── 📂 backend/
+│   ├── alembic/
+│   │   ├── __pycache__/
+│   │   │   └── env.cpython-311.pyc
+│   │   ├── env.py
+│   │   ├── script.py.mako
+│   │   └── 📂 versions/
+│   │       ├── __pycache__/
+│   │       │   └── 1fdaa141e780_initial_create_of_all_tables.cpython-311.pyc
+│   │       └── 1fdaa141e780_initial_create_of_all_tables.py
 │   │
-│   ├── 📂 alembic/                      
-│   │   └── 📂 versions/                 
+│   ├── alembic.ini
 │   │
-│   ├── 📂 app/                          
-│   │   ├── __pycache__/                 
+│   ├── 📂 app/
+│   │   ├── __pycache__/
+│   │   │   ├── main.cpython-311.pyc
+│   │   │   └── seeds.cpython-311.pyc
 │   │   │
-│   │   ├── 📂 api/                      
+│   │   ├── 📂 api/
 │   │   │   ├── __init__.py
-│   │   │   └── 📂 v1/ 
-│   │   │       └── 📂 endpoint.py                 
-│   │   │           ├── __init__.py
-│   │   │           ├── auth.py              # Endpoints signup/login/me
-│   │   │           ├── contact.py           # Endpoints messages contact
-│   │   │           ├── projects.py          # Endpoints CRUD + search + upload + history
-│   │   │           ├── education.py         # Endpoints CRUD formations
-│   │   │           ├── skill.py       
-│   │   │           └── experience.py        # Endpoints CRUD expériences
+│   │   │   ├── __pycache__/
+│   │   │   │   └── __init__.cpython-311.pyc
+│   │   │   └── 📂 v1/
+│   │   │       ├── __init__.py
+│   │   │       ├── __pycache__/
+│   │   │       └── 📂 endpoints/
 │   │   │
-│   │   ├── 📂 core/                     
-│   │   │   ├── config.py                # Variables d'environnement / settings
-│   │   │   ├── auth.py 
-│   │   │   └── security.py              # JWT, hash mot de passe, get_current_user, admin_required
+│   │   ├── 📂 core/
+│   │   │   ├── __pycache__/
+│   │   │   │   ├── config.cpython-311.pyc
+│   │   │   │   └── security.cpython-311.pyc
+│   │   │   ├── auth.py
+│   │   │   ├── config.py
+│   │   │   └── security.py
 │   │   │
-│   │   ├── 📂 crud/                     
+│   │   ├── 📂 crud/
 │   │   │   ├── __init__.py
-│   │   │   ├── user.py                  # create_user, get_user_by_email
+│   │   │   ├── __pycache__/
+│   │   │   │   ├── __init__.cpython-311.pyc
+│   │   │   │   ├── contact.cpython-311.pyc
+│   │   │   │   ├── education.cpython-311.pyc
+│   │   │   │   ├── experience.cpython-311.pyc
+│   │   │   │   ├── project.cpython-311.pyc
+│   │   │   │   ├── skill.cpython-311.pyc
+│   │   │   │   └── user.cpython-311.pyc
 │   │   │   ├── contact.py
-│   │   │   ├── project.py               # CRUD + search + history + upload
-│   │   │   ├── education.py             # CRUD formations
-│   │   │   ├── skill.py       
-│   │   │   └── experience.py            # CRUD expériences
+│   │   │   ├── education.py
+│   │   │   ├── experience.py
+│   │   │   ├── project.py
+│   │   │   ├── skill.py
+│   │   │   └── user.py
 │   │   │
-│   │   ├── 📂 db/                       
-│   │   │   ├── base.py                  # Base pour tous les modèles
-│   │   │   └── session.py               # Connexion SQLAlchemy
+│   │   ├── 📂 db/
+│   │   │   ├── __pycache__/
+│   │   │   │   ├── base.cpython-311.pyc
+│   │   │   │   └── session.cpython-311.pyc
+│   │   │   ├── base.py
+│   │   │   └── session.py
 │   │   │
-│   │   ├── 📂 models/                   
+│   │   ├── main.py
+│   │   │
+│   │   ├── 📂 models/
 │   │   │   ├── __init__.py
-│   │   │   ├── user.py                  
-│   │   │   ├── contact.py               
-│   │   │   ├── project.py               
-│   │   │   ├── education.py             
-│   │   │   ├── experience.py       
-│   │   │   ├── skill.py          
+│   │   │   ├── __pycache__/
+│   │   │   │   ├── __init__.cpython-311.pyc
+│   │   │   │   ├── contact.cpython-311.pyc
+│   │   │   │   ├── education.cpython-311.pyc
+│   │   │   │   ├── experience.cpython-311.pyc
+│   │   │   │   ├── project.cpython-311.pyc
+│   │   │   │   ├── skill.cpython-311.pyc
+│   │   │   │   └── user.cpython-311.pyc
+│   │   │   ├── contact.py
+│   │   │   ├── education.py
+│   │   │   ├── experience.py
+│   │   │   ├── project.py
+│   │   │   ├── skill.py
+│   │   │   └── user.py
 │   │   │
-│   │   ├── 📂 schemas/                  
+│   │   ├── 📂 schemas/
 │   │   │   ├── __init__.py
-│   │   │   ├── user.py                  # UserCreate / UserRead
-│   │   │   ├── contact.py               
-│   │   │   ├── project.py               # ProjectCreate / ProjectRead / ProjectUpdate
-│   │   │   ├── education.py             # EducationCreate / EducationRead / EducationUpdate
-│   │   │   ├── skill.py       
-│   │   │   └── experience.py            # ExperienceCreate / ExperienceRead / ExperienceUpdate
+│   │   │   ├── __pycache__/
+│   │   │   │   ├── __init__.cpython-311.pyc
+│   │   │   │   ├── contact.cpython-311.pyc
+│   │   │   │   ├── education.cpython-311.pyc
+│   │   │   │   ├── experience.cpython-311.pyc
+│   │   │   │   ├── project.cpython-311.pyc
+│   │   │   │   ├── skill.cpython-311.pyc
+│   │   │   │   └── user.cpython-311.pyc
+│   │   │   ├── contact.py
+│   │   │   ├── education.py
+│   │   │   ├── experience.py
+│   │   │   ├── project.py
+│   │   │   ├── skill.py
+│   │   │   └── user.py
 │   │   │
-│   │   └── main.py                      # Point d’entrée FastAPI
+│   │   └── seeds.py
 │   │
-│   ├── Dockerfile                       
-│   ├── requirements.txt                 
-│   └── README.md                        
+│   ├── Dockerfile
+│   ├── README.md
+│   └── requirements.txt
 │
-├── 📂 frontend/                         
-│   ├── index.html                       
-│   ├── vite.config.ts                   
-│   ├── tailwind.config.js               
-│   ├── postcss.config.js                
-│   ├── eslint.config.js                 
-│   ├── tsconfig*.json                   
-│   ├── pnpm-lock.yaml                   
-│   ├── package.json                     
+├── 📂 frontend/
+│   ├── index.html
+│   ├── eslint.config.js
+│   ├── tailwind.config.js
+│   ├── postcss.config.js
+│   ├── vite.config.ts
+│   ├── tsconfig.json
+│   ├── tsconfig.app.json
+│   ├── tsconfig.node.json
+│   ├── package.json
+│   ├── pnpm-lock.yaml
+│   ├── README.md
 │   │
-│   ├── 📂 public/                       
-│   │   └── vite.svg
+│   ├── 📂 public/
+│   │   ├── vite.svg
+│   │   └── 📂 fonts/
+│   │       └── Orbitron-Black.ttf
 │   │
-│   ├── 📂 src/      
-│   │   ├── 📂 api/    
-│   │   │   ├── apiClients.ts   
+│   ├── 📂 src/
+│   │   ├── App.tsx
+│   │   ├── index.css
+│   │   ├── main.tsx
 │   │   │
-│   │   ├── 📂 assets/    
-│   │   │   ├── react.svg
-│   │   │         
-│   │   ├── 📂 components/    
-│   │   │   ├── Card.tsx
-│   │   │   ├── Footer.tsx
-│   │   │   ├── Navbar.tsx
-│   │   │   ├── SectionTitle.tsx
-│   │   │  
-│   │   ├── 📂 context/    
-│   │   │   ├── UserContext.tsx
-│   │   │  
-│   │   ├── 📂 hooks/    
+│   │   ├── 📂 api/
+│   │   │   ├── apiClient.ts
+│   │   │   ├── education.ts
+│   │   │   ├── experience.ts
+│   │   │   ├── project.ts
+│   │   │   └── skill.ts
+│   │   │
+│   │   ├── 📂 assets/
+│   │   │   └── react.svg
+│   │   │
+│   │   ├── 📂 components/
+│   │   │   ├── 📂 layout/
+│   │   │   │   ├── Layout.tsx
+│   │   │   │   ├── Navbar.tsx
+│   │   │   │   └── Footer.tsx
+│   │   │   │
+│   │   │   ├── 📂 threeDemo/
+│   │   │   │   ├── Dataset.ts
+│   │   │   │   ├── InteractiveNode.tsx
+│   │   │   │   ├── ThreeDemoPage.tsx
+│   │   │   │   └── ThreeGraphScene.tsx
+│   │   │   │
+│   │   │   └── 📂 ui/
+│   │   │       ├── Capsule.tsx
+│   │   │       ├── Card.tsx
+│   │   │       ├── Input.tsx
+│   │   │       ├── SectionTitle.tsx
+│   │   │       └── ThreeBackground.tsx
+│   │   │
+│   │   ├── 📂 context/
+│   │   │   └── AuthContext.tsx
+│   │   │
+│   │   ├── 📂 hooks/
+│   │   │   ├── useAuth.ts
 │   │   │   ├── useFetch.ts
-│   │   │  
-│   │   ├── 📂 pages/    
+│   │   │   └── useTypingEffect.ts
+│   │   │
+│   │   ├── 📂 pages/
+│   │   │   ├── Admin.tsx
 │   │   │   ├── Contact.tsx
 │   │   │   ├── Education.tsx
 │   │   │   ├── Experience.tsx
 │   │   │   ├── Home.tsx
 │   │   │   ├── Projects.tsx
 │   │   │   ├── Skills.tsx
-│   │   │  
-│   │   ├── main.tsx                     
-│   │   ├── App.tsx                      
-│   │   ├── App.css                      
-│   │   ├── index.css                    
-│   │   └── 📂 assets/                   
-│   │       └── react.svg
-│   │
-│   └── README.md                        
+│   │   │   └── Visualization.tsx
+│   │   │
+│   │   └── 📂 router/
+│   │       ├── index.tsx
+│   │       └── PrivateRoute.tsx
 │
-├── 📂 envportfolio/                     
-│   ├── bin/                             
-│   ├── lib/                             
-│   ├── include/                         
-│   └── pyvenv.cfg                        
+├── 📂 documentationTechnique/
+│   ├── archi.txt
+│   ├── auth.txt
+│   ├── backend_endpoints.xlsx
+│   ├── CAHIER_DES_CHARGES.txt
+│   └── front.txt
 │
-├── docker-compose.yml                   
-├── README.md                            
-└── CAHIER_DES_CHARGES.txt               
+├── 📂 envportfolio/
+│   ├── bin/
+│   ├── lib/
+│   ├── include/
+│   └── pyvenv.cfg
+│
+├── docker-compose.yml
+├── Book1.xlsx
+├── ~$Book1.xlsx
+└── README.md

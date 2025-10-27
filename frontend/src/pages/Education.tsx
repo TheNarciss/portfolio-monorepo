@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import type { EducationRead } from "../api/education";
 import { fetchEducations } from "../api/education";
-import EducationCard from "../components/educationCard";
+import Card from "../components/ui/Card";
 
 const EducationPage: React.FC = () => {
   const [educations, setEducations] = useState<EducationRead[]>([]);
@@ -27,7 +27,15 @@ const EducationPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {educations.map((edu) => <EducationCard key={edu.id} edu={edu} />)}
+      {educations.map((edu) => (
+        <Card
+          key={edu.id}
+          title={edu.degree} // utilisation du champ existant
+          description={edu.description}
+          image_url={undefined} // pas de champ image dans EducationRead
+          tech_stack={`${edu.school ?? ""} • ${edu.start_date ? new Date(edu.start_date).getFullYear() : ""} - ${edu.end_date ? new Date(edu.end_date).getFullYear() : "Présent"}`}
+        />
+      ))}
     </div>
   );
 };

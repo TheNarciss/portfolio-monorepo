@@ -1,0 +1,150 @@
+# =========================
+# 🌍 GLOBAL IGNORE
+# =========================
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+*.orig
+*.lock
+~$*
+__pycache__/
+.env
+.env.*
+.vscode/
+.idea/
+*.code-workspace
+
+# =========================
+# 🐍 BACKEND (FastAPI / Python)
+# =========================
+# Environnements virtuels
+env/
+envportfolio/
+venv/
+.venv/
+
+# Compilés Python
+*.py[cod]
+*$py.class
+
+# Cache & bytecode
+__pycache__/
+.pytest_cache/
+.cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+pytestdebug.log
+
+# Outils & migrations
+alembic/versions/__pycache__/
+alembic/*.pyc
+alembic.ini~
+*.db
+*.sqlite3
+
+# Fichiers d’exécution
+*.pid
+*.log
+instance/
+.wheels/
+pip-wheel-metadata/
+.eggs/
+*.egg-info/
+dist/
+build/
+
+# Jupyter / notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# =========================
+# ⚛️ FRONTEND (React + Vite + PNPM)
+# =========================
+frontend/node_modules/
+frontend/.vite/
+frontend/dist/
+frontend/.pnpm-store/
+frontend/.eslintcache
+frontend/*.local
+frontend/.DS_Store
+frontend/.env
+frontend/.env.*
+frontend/pnpm-lock.yaml
+
+# =========================
+# 🐳 DOCKER / CONTAINERS
+# =========================
+*.pid
+*.seed
+*.tar
+*.log
+.dockerignore
+docker-compose.override.yml
+docker-compose.*.yml
+!docker-compose.yml
+
+# =========================
+# 📊 DOCUMENTATION / EXPORTS
+# =========================
+documentationTechnique/*.xlsx
+documentationTechnique/*.pdf
+documentationTechnique/*.docx
+~$*.xlsx
+~$*.docx
+*.bak
+*.old
+*.tmp
+
+# =========================
+# 🧰 SYSTEME & DÉPENDANCES
+# =========================
+.envportfolio/
+.envrc
+.nox/
+.tox/
+.pdm.toml
+pdm.lock
+pip-log.txt
+pip-delete-this-directory.txt
+
+# =========================
+# 🧠 TESTS & OUTILS DEV
+# =========================
+/tests/__pycache__/
+/tests/.pytest_cache/
+/tests/.coverage
+coverage.xml
+test-reports/
+pytestdebug.log
+*.cover
+*.py,cover
+
+# =========================
+# 📦 EXPORTS / DATA TEMP
+# =========================
+*.csv
+*.json
+*.pkl
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.bak
+*.tmp
+*.orig
+*.old
+
+# =========================
+# 🚀 PROJECT-SPECIFIC
+# =========================
+Book1.xlsx
+~$Book1.xlsx
+frontend/public/fonts/
+frontend/public/vite.svg
+backend/alembic/versions/__pycache__/

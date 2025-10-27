@@ -31,7 +31,7 @@ export interface EducationUpdate {
   description?: string;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1/educations";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1/education";
 
 const getAuthHeader = () => {
   const token = localStorage.getItem("access_token");

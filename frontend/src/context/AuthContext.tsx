@@ -1,3 +1,7 @@
+// frontend/src/context/AuthContext.tsx
+
+
+
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 
 import apiClient from "@api/apiClient";

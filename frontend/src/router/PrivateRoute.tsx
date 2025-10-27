@@ -1,8 +1,9 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@context/AuthContext";
+import type { ReactElement } from "react";
 
 interface PrivateRouteProps {
-  children: JSX.Element;
+  children: ReactElement;
   adminOnly?: boolean;
 }
 

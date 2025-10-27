@@ -1,8 +1,7 @@
-// src/pages/Projects.tsx
 import React, { useEffect, useState } from "react";
 import { fetchProjects } from "../api/project";
 import type { ProjectRead } from "../api/project";
-import Card from "../components/Card";
+import Card from "../components/ui/Card";
 
 const Projects: React.FC = () => {
   const [projects, setProjects] = useState<ProjectRead[]>([]);
@@ -30,7 +29,15 @@ const Projects: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {projects.map((project) => (
-        <Card key={project.id} project={project} />
+        <Card
+          key={project.id}
+          title={project.title}
+          description={project.description}
+          tech_stack={project.tech_stack}
+          github_url={project.github_url}
+          live_url={project.live_url}
+          image_url={project.image_url}
+        />
       ))}
     </div>
   );
