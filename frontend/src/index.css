@@ -23,6 +23,10 @@ body {
   flex-direction: column;
   scroll-behavior: smooth;
 }
+html, body, #root {
+  height: 100%;
+  overflow: hidden; /* empêche tout scroll */
+}
 
 /* --- Liens --- */
 a {

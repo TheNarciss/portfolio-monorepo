@@ -2,7 +2,7 @@ import Layout from "@components/layout/Layout";
 import Capsule from "@components/ui/Capsule";
 import { motion } from "framer-motion";
 import { useTypingEffect } from "@hooks/useTypingEffect";
-import ThreeBackground from "@components/ui/ThreeBackground"; // fond animé Three.js
+import ThreeBackground from "@components/ui/ThreeBackground";
 
 const sections = [
   { id: "projects", label: "Projets", route: "/projects" },
@@ -16,9 +16,11 @@ const Home = () => {
 
   return (
     <Layout>
-      <section className="relative flex flex-col items-center justify-center min-h-screen px-6 text-center overflow-hidden bg-[var(--bg)]">
-        {/* Fond Three.js interactif */}
-        <ThreeBackground />
+      <section className="relative flex flex-col items-center justify-center w-full min-h-[calc(100vh-64px)] text-center overflow-hidden">
+        {/* Fond Three.js full screen */}
+        <div className="absolute inset-0 z-0">
+          <ThreeBackground />
+        </div>
 
         {/* Présentation */}
         <motion.h1
@@ -32,7 +34,7 @@ const Home = () => {
         </motion.h1>
 
         <motion.p
-          className="text-gray-300 text-lg max-w-2xl mb-16 z-10"
+          className="text-gray-300 text-lg max-w-2xl mb-16 z-10 px-4 sm:px-6 md:px-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.8 }}
