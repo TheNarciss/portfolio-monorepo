@@ -22,17 +22,17 @@ const EducationPage: React.FC = () => {
     loadEducations();
   }, []);
 
-  if (loading) return <p className="text-center mt-10">Chargement...</p>;
-  if (error) return <p className="text-center mt-10 text-red-500">{error}</p>;
+  if (loading) return <p className="text-center mt-fluid-4 text-fluid-base">Chargement...</p>;
+  if (error) return <p className="text-center mt-fluid-4 text-red-500 text-fluid-base">{error}</p>;
 
   return (
-    <div className="container mx-auto px-4 py-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="container mx-auto px-fluid-4 py-fluid-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-fluid-4">
       {educations.map((edu) => (
         <Card
           key={edu.id}
-          title={edu.degree} // utilisation du champ existant
+          title={edu.degree}
           description={edu.description}
-          image_url={undefined} // pas de champ image dans EducationRead
+          image_url={undefined}
           tech_stack={`${edu.school ?? ""} • ${edu.start_date ? new Date(edu.start_date).getFullYear() : ""} - ${edu.end_date ? new Date(edu.end_date).getFullYear() : "Présent"}`}
         />
       ))}

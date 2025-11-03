@@ -1,12 +1,15 @@
 import Layout from "@components/layout/Layout";
+import PageWrapper from "@components/layout/PageWrapper";
 import ThreeScene from "@components/threeDemo/ThreeGraphScene";
 
-const Visualization = () => {
+const Visualization: React.FC = () => {
   return (
     <Layout>
-      <div className="w-screen h-screen">
-        <ThreeScene />
-      </div>
+      <PageWrapper zoom="out">
+        <div className="w-screen h-screen">
+          <ThreeScene />
+        </div>
+      </PageWrapper>
     </Layout>
   );
 };

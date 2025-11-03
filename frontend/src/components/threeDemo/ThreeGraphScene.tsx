@@ -48,9 +48,9 @@ export default function ThreeGraphScene() {
 
   return (
     <div className="relative w-full h-full">
-      <Canvas camera={{ position: [0, 0, 20], fov: 60 }}>
+      <Canvas camera={{ position: [0, 0, 7], fov: 60 }}>
         <ambientLight intensity={0.3} />
-        <directionalLight position={[5, 5, 5]} intensity={1} />
+        <directionalLight position={[5, 5, 5]} intensity={0.5} />
         <Stars radius={100} depth={50} count={1000} factor={4} fade />
 
         {positionedNodes.map((node) => (
@@ -91,7 +91,7 @@ export default function ThreeGraphScene() {
 
         <OrbitControls enablePan enableZoom enableRotate />
         <EffectComposer>
-          <Bloom luminanceThreshold={0} luminanceSmoothing={0.3} height={300} intensity={0.25} />
+          <Bloom luminanceThreshold={0} luminanceSmoothing={0} height={300} intensity={0} />
         </EffectComposer>
       </Canvas>
 

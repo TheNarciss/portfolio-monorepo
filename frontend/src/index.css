@@ -1,35 +1,38 @@
+/* stylelint-disable at-rule-no-unknown */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* stylelint-enable at-rule-no-unknown */
 
 /* --- Variables globales --- */
 :root {
-  --bg: #0f0f0f; /* fond général */
-  --bg-card: #1a1a1a; /* cartes / sections */
-  --text-main: #e0e0e0; /* texte principal */
-  --text-muted: #888; /* texte secondaire */
-  --accent: #7fcf7f; /* vert pastel */
-  --font-code: 'Fira Code', monospace; /* typo rétro code */
+  --bg: #0a0a0a;
+  --bg-card: #1a1a1a;
+  --text-main: #e0e0e0;
+  --text-muted: #888;
+  --accent: #7fcf7f;
+  --font-code: 'Fira Code', monospace;
 }
 
-/* --- Body global --- */
+/* --- Base globale --- */
+html {
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
 body {
   font-family: var(--font-code);
-  background-color: var(--bg);
-  color: var(--text-main);
   margin: 0;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  scroll-behavior: smooth;
-}
-html, body, #root {
-  height: 100%;
-  overflow: hidden; /* empêche tout scroll */
+  overflow-x: hidden; /* ✅ scroll vertical autorisé */
+  background-color: var(--bg);
 }
 
-/* --- Liens --- */
+#root {
+  @apply flex flex-col min-h-screen;
+}
+
 a {
+  @apply transition-colors duration-200;
   color: var(--accent);
   text-decoration: none;
 }
@@ -37,128 +40,80 @@ a:hover {
   text-decoration: underline;
 }
 
-/* --- Titres --- */
 h1, h2, h3, h4, h5 {
   font-family: var(--font-code);
   color: var(--text-main);
   margin: 0;
 }
 
-/* --- Sections --- */
-section {
-  padding: 4rem 1rem;
-}
+/* --- Layer components pour @apply personnalisés --- */
+@layer components {
+  /* Sections */
+  section {
+    @apply px-fluid-4 py-fluid-16 md:px-fluid-8 lg:px-fluid-16;
+  }
 
-/* --- Hero --- */
-.hero {
-  text-align: center;
-  background-color: var(--bg);
-  padding: 8rem 1rem;
-}
-.hero h1 {
-  font-size: 5rem;
-  color: var(--accent);
-  margin-bottom: 1rem;
-}
-.hero p {
-  color: var(--text-muted);
-  font-size: 1.25rem;
-  max-width: 700px;
-  margin: 0 auto;
-}
+  /* Hero */
+  .hero {
+    @apply text-center bg-bg px-fluid-4 py-fluid-16 md:py-fluid-32;
+  }
 
-/* --- Cards --- */
-.card {
-  background-color: var(--bg-card);
-  border: 1px solid #333;
-  border-radius: 12px;
-  padding: 1.5rem;
-  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-}
-.card:hover {
-  transform: translateY(-4px);
-  border-color: var(--accent);
-  box-shadow: 0 4px 20px rgba(127, 207, 127, 0.2);
-}
-
-/* --- Boutons --- */
-button {
-  font-family: var(--font-code);
-  background-color: var(--bg-card);
-  color: var(--text-main);
-  border: 1px solid #333;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-button:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-/* --- Navbar --- */
-nav {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 50;
-  background-color: var(--bg-card);
-  border-bottom: 1px solid #333;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-}
-nav ul {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  padding: 1rem 0;
-  margin: 0;
-  list-style: none;
-}
-nav ul li a {
-  color: var(--text-main);
-  position: relative;
-  font-weight: bold;
-}
-nav ul li a::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -4px;
-  width: 0%;
-  height: 2px;
-  background-color: var(--accent);
-  transition: width 0.3s ease;
-}
-nav ul li a:hover::after,
-nav ul li a.active::after {
-  width: 100%;
-}
-
-/* --- Footer --- */
-footer {
-  background-color: var(--bg-card);
-  color: var(--text-muted);
-  text-align: center;
-  padding: 2rem 1rem;
-  border-top: 1px solid #333;
-}
-
-/* --- Responsive --- */
-@media (max-width: 768px) {
   .hero h1 {
-    font-size: 3rem;
+    @apply text-fluid-4xl sm:text-fluid-5xl md:text-fluid-6xl font-bold text-accent mb-fluid-4;
+  }
+
+  .hero p {
+    @apply text-text-muted text-fluid-base md:text-fluid-lg max-w-2xl mx-auto;
+  }
+  /* Cards */
+  .card {
+    @apply bg-card border border-[#333] rounded-xl p-fluid-8 transition-transform duration-300 ease-in-out hover:-translate-y-1 hover:border-accent hover:shadow-card;
+  }
+
+  /* Boutons */
+  button {
+    @apply font-mono bg-card text-text-main border border-[#333] px-fluid-4 py-fluid-2 rounded-lg cursor-pointer transition-all duration-200;
+  }
+  button:hover {
+    @apply border-accent text-accent;
+  }
+
+  /* Navbar */
+  nav {
+    @apply fixed top-0 left-0 w-full z-50 bg-card border-b border-[#333] shadow-[0_2px_8px_rgba(0,0,0,0.5)];
   }
   nav ul {
-    flex-direction: column;
-    gap: 1rem;
+    @apply flex justify-center gap-fluid-8 md:gap-fluid-12 py-fluid-4 list-none;
+  }
+  nav ul li a {
+    @apply relative font-bold text-text-main;
+  }
+  nav ul li a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0%;
+    height: 2px;
+    background-color: var(--accent);
+    transition: width 0.3s ease;
+  }
+  nav ul li a:hover::after,
+  nav ul li a.active::after {
+    width: 100%;
+  }
+
+  /* Footer */
+  footer {
+    @apply bg-card text-text-muted text-center py-fluid-8 border-t border-[#333];
   }
 }
+
+/* --- Animations --- */
 @keyframes blink {
   0%, 50%, 100% { opacity: 1; }
   25%, 75% { opacity: 0; }
 }
-
 .animate-pulse {
   animation: blink 1s infinite;
 }
