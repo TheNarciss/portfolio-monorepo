@@ -7,10 +7,11 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 const sections = [
-  { id: "projects", label: "Projets", route: "/visualization" },
+  { id: "projects", label: "Projets", route: "/projects" },
   { id: "skills", label: "Compétences", route: "/skills" },
   { id: "experience", label: "Expériences", route: "/experience" },
   { id: "education", label: "Formations", route: "/education" },
+  { id: "skills map", label: "Skills map", route: "/visualization" },
 ];
 
 const Home: React.FC = () => {

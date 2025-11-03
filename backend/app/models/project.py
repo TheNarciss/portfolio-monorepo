@@ -1,3 +1,5 @@
+# backend/app/models/project.py
+
 from sqlalchemy import Column, String, Integer, Boolean, DateTime
 from sqlalchemy.orm import declarative_base
 from datetime import datetime
