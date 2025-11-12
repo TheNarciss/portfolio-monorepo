@@ -1,3 +1,5 @@
+# backend/app/models/skill.py
+
 from sqlalchemy import Column, String, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import declarative_base, relationship
 from datetime import datetime

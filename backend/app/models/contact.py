@@ -1,3 +1,5 @@
+# backend/app/models/contact.py
+
 from sqlalchemy import Column, Integer, String, Text
 from app.db.base import Base
 

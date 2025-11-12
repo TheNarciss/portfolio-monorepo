@@ -17,26 +17,27 @@ portfolio-monorepo/
 │   │   │
 │   │   ├── 📂 chatbot/                         ← 🧠 Nouveau dossier IA (notre mini RAG)
 │   │   │   ├── 📂 api/
-│   │   │   │   └── router.py                  # ⚙️ Route FastAPI → /api/v1/chatbot/ask
-│   │   │   │                                 # On y mettra la logique pour interroger le bot
+│   │   │   │   └── router.py                
 │   │   │   │
 │   │   │   ├── 📂 core/
-│   │   │   │   ├── embeddings_service.py      # 💬 Gère la création et le stockage des embeddings
-│   │   │   │   ├── github_ingestion.py        # 🐙 Va chercher et vectorise le contenu de ton GitHub
-│   │   │   │   ├── faiss_index.py             # 🧱 Gère l’index FAISS pour les similarités
-│   │   │   │   ├── rag_pipeline.py            # 🤖 Chaîne complète : question → recherche → réponse LLM
+│   │   │   │   ├── embeddings_service.py     
+│   │   │   │   ├── github_ingestion.py        
+│   │   │   │   ├── faiss_index.py             
+│   │   │   │   ├── rag_pipeline.py           
+│   │   │   │   ├── openrouter_llm.py    
 │   │   │   │
 │   │   │   ├── 📂 crud/
-│   │   │   │   └── embedding.py               # (facultatif) accès BDD pour stocker les vecteurs ou logs
+│   │   │   │   └── embedding.py               
 │   │   │   │
 │   │   │   ├── 📂 models/
-│   │   │   │   └── embedding.py               # (vide pour l’instant) modèle SQLAlchemy pour embeddings
+│   │   │   │   ├── init_embedding.py   
+│   │   │   │   └── embedding.py               
 │   │   │   │
 │   │   │   ├── 📂 schemas/
-│   │   │   │   └── chatbot.py                 # 🧾 Schéma Pydantic : Question / Réponse
+│   │   │   │   └── chatbot.py                
 │   │   │   │
-│   │   │   ├── __init__.py                   # (vide)
-│   │   │   └── README.md                     # (optionnel) résumé du module Chatbot
+│   │   │   ├── __init__.py                   
+│   │   │   └── README.md                     
 │   │   │
 │   │   ├── 📂 core/
 │   │   │   ├── auth.py

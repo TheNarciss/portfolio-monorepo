@@ -12,6 +12,7 @@ const sections = [
   { id: "experience", label: "Expériences", route: "/experience" },
   { id: "education", label: "Formations", route: "/education" },
   { id: "skills map", label: "Skills map", route: "/visualization" },
+  { id: "chatbot", label: "Chatbot", route: "/chatbot" },
 ];
 
 const Home: React.FC = () => {

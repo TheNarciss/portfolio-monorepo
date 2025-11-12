@@ -3,7 +3,9 @@
 
 from fastapi import FastAPI
 from app.api.v1.endpoints import contact, projects, auth, education, experience, skill
+from app.chatbot.api import router as chatbot_router
 from fastapi.middleware.cors import CORSMiddleware
+from app.chatbot.api.router import router as chatbot_router
 
 
 from app.db.base import init_db
@@ -28,3 +30,4 @@ app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
 app.include_router(education.router, prefix="/api/v1/education", tags=["education"])
 app.include_router(experience.router, prefix="/api/v1/experience", tags=["experience"])
 app.include_router(skill.router, prefix="/api/v1/skill", tags=["skill"])
+app.include_router(chatbot_router, prefix="/api/v1/chatbot", tags=["chatbot"])

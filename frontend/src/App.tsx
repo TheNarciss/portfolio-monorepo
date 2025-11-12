@@ -8,6 +8,7 @@ import Education from "./pages/Education";
 import Experience from "./pages/Experience";
 import Skills from "./pages/Skills";
 import ThreeDemoPage from "@components/threeDemo/ThreeDemoPage";
+import Chatbot from "@pages/Chatbot";
 function App() {
   return (
     <Router>
@@ -19,6 +20,7 @@ function App() {
         <Route path="/education" element={<Education />} />
         <Route path="/experience" element={<Experience />} />
         <Route path="/skills" element={<Skills />} />
+        <Route path="/chatbot" element={<Chatbot />} />
       </Routes>
     </Router>
   );

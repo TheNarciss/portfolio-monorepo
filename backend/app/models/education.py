@@ -1,3 +1,5 @@
+# backend/app/models/education.py
+
 from sqlalchemy import Column, String, DateTime, Text
 from sqlalchemy.orm import declarative_base
 from datetime import datetime

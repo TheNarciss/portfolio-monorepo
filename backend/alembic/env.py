@@ -1,8 +1,12 @@
 from logging.config import fileConfig
 from sqlalchemy import create_engine, pool
 from alembic import context
+import sys    
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from app.db.base import Base  # Base qui regroupe tous les modèles
 from app.core.config import settings  # ton fichier config.py avec SQLALCHEMY_DATABASE_URL
+from app.chatbot.models.embedding import Embedding
 
 # Alembic Config object
 config = context.config
