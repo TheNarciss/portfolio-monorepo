@@ -9,6 +9,8 @@ from app.chatbot.api.router import router as chatbot_router
 
 
 from app.db.base import init_db
+import logging
+
 
 
 app = FastAPI(title="Portfolio API")
@@ -31,3 +33,7 @@ app.include_router(education.router, prefix="/api/v1/education", tags=["educatio
 app.include_router(experience.router, prefix="/api/v1/experience", tags=["experience"])
 app.include_router(skill.router, prefix="/api/v1/skill", tags=["skill"])
 app.include_router(chatbot_router, prefix="/api/v1/chatbot", tags=["chatbot"])
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)

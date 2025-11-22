@@ -1,90 +1,126 @@
-import Layout from "@components/layout/Layout";
-import PageWrapper from "@components/layout/PageWrapper";
+// frontend/src/pages/Chatbot.tsx
+import React, { useState, useRef, useEffect } from "react";
+import { motion } from "framer-motion";
 import ThreeBackground from "@components/ui/ThreeBackground";
-import { useState, useEffect, useRef } from "react";
 import apiClient from "@api/apiClient";
+import Bubble from "@components/chatbot/Bubble";
 
 interface Message {
-  role: "user" | "bot";
-  content: string;
+  author: "user" | "bot";
+  text: string;
+}
+
+interface Conversation {
+  id: string;
+  title: string;
+  messages: Message[];
 }
 
 const Chatbot: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const [isTyping, setIsTyping] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>([
+    { id: "1", title: "Conversation 1", messages: [] },
+    { id: "2", title: "Conversation 2", messages: [] },
+  ]);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Scroll automatique vers le bas
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages, isTyping]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    // Typage explicite pour Message
-    const userMessage: Message = { role: "user", content: input };
+    const userMessage: Message = { author: "user", text: input };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
-    setLoading(true);
+    setIsTyping(true);
 
     try {
-      const res = await apiClient.post("/api/v1/chatbot/ask", { question: input });
-      const botMessage: Message = { role: "bot", content: res.data.answer };
+      const res = await apiClient.post("/api/v1/chatbot/ask", {
+        question: input,
+        context: [],
+        top_k: 5,
+      });
+
+      const botText = res.data.answer || "Désolé, je n'ai pas compris...";
+      const botMessage: Message = { author: "bot", text: botText };
       setMessages((prev) => [...prev, botMessage]);
-    } catch (err) {
-      console.error(err);
-      const errorMessage: Message = { role: "bot", content: "Erreur lors de la réponse." };
-      setMessages((prev) => [...prev, errorMessage]);
+    } catch (err: any) {
+      console.error(err.response?.data || err);
+      setMessages((prev) => [...prev, { author: "bot", text: "Erreur lors de la réponse du bot." }]);
     } finally {
-      setLoading(false);
+      setIsTyping(false);
     }
   };
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") sendMessage();
+  };
 
   return (
-    <Layout>
-      <PageWrapper zoom="in">
-        <div className="relative flex flex-col w-full min-h-[calc(100vh-64px)] text-center overflow-hidden px-fluid-4">
-          <div className="absolute inset-0 z-0">
-            <ThreeBackground />
-          </div>
+    <div className="relative w-full h-screen flex bg-gray-900 text-white overflow-hidden">
+      <ThreeBackground />
 
-          <div className="z-10 flex-1 flex flex-col max-w-2xl mx-auto bg-card/80 backdrop-blur-md rounded-lg p-4 shadow-lg">
-            <div className="flex-1 overflow-y-auto mb-4 space-y-3">
-              {messages.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`px-4 py-2 rounded-lg max-w-[80%] ${
-                    msg.role === "user" ? "self-end bg-accent text-white" : "self-start bg-gray-200 text-black"
-                  }`}
-                >
-                  {msg.content}
-                </div>
-              ))}
-              <div ref={bottomRef}></div>
-            </div>
+      {/* Sidebar historique */}
+      <div className="w-64 bg-gray-800 p-4 flex-shrink-0 overflow-y-auto z-50">
+        <h2 className="text-lg font-semibold mb-4">Historique des conversations</h2>
+        <ul className="space-y-2">
+          {conversations.map((conv) => (
+            <li
+              key={conv.id}
+              className="p-2 rounded hover:bg-gray-700 cursor-pointer"
+              onClick={() => setMessages(conv.messages)}
+            >
+              {conv.title}
+            </li>
+          ))}
+        </ul>
+      </div>
 
-            <div className="flex gap-2">
-              <input
-                type="text"
-                className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                placeholder="Pose ta question..."
-              />
-              <button
-                onClick={sendMessage}
-                className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 transition"
-                disabled={loading}
-              >
-                {loading ? "..." : "Envoyer"}
-              </button>
-            </div>
-          </div>
+      {/* Chat principal */}
+      <div className="flex-1 relative flex flex-col justify-end p-6 pointer-events-auto h-full overflow-hidden">
+        {/* Messages */}
+        <div
+          ref={scrollRef}
+          className="flex-1 overflow-y-auto mb-4 space-y-3 px-2 sm:px-4 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900"
+        >
+          {messages.map((m, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, x: m.author === "user" ? 100 : -100 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3 }}
+              className="flex"
+            >
+              <Bubble text={m.text} author={m.author} isTyping={m.author === "bot" && isTyping} />
+            </motion.div>
+          ))}
         </div>
-      </PageWrapper>
-    </Layout>
+
+        {/* Input */}
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="Écris un message..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            className="flex-1 p-3 rounded-lg border border-gray-700 bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent"
+          />
+          <button
+            onClick={sendMessage}
+            className="px-5 py-3 bg-accent text-gray-900 font-semibold rounded-lg hover:scale-105 transition-transform duration-200"
+          >
+            Envoyer
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

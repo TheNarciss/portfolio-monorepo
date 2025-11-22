@@ -15,7 +15,7 @@ router = APIRouter()
 # Clé API et paramètres OpenRouter
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
-OPENROUTER_MODEL = "nvidia/nemotron-nano-12b-v2-vl:free"  # modèle gratuit compatible chat
+OPENROUTER_MODEL = "google/gemma-3n-e2b-it:free"  # modèle gratuit compatible chat
 
 
 class OpenRouterLLM:
