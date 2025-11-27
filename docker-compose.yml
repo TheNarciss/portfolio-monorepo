@@ -16,6 +16,32 @@ services:
     networks:
       - portfolio_net
 
+  backend:
+    build:
+      context: ./backend
+    container_name: portfolio_backend
+    restart: always
+    env_file:
+      - ./backend/.env   # mettre tes variables ici (SECRET_KEY, DATABASE_URL, etc)
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    networks:
+      - portfolio_net
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: portfolio_frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "3000:4173"  # mappe port interne 4173 → externe 3000
+    networks:
+      - portfolio_net
+
 networks:
   portfolio_net:
     driver: bridge

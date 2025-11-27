@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from "react-route
 import { AnimatePresence } from "framer-motion";
 import Home from "@pages/Home";
 import Visualization from "@pages/Visualization";
+import EyeTracking from "@pages/EyeTracking"; // on créera ce composant React
 
 const AnimatedRoutes: React.FC = () => {
   const location = useLocation();
@@ -11,6 +12,7 @@ const AnimatedRoutes: React.FC = () => {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Home />} />
         <Route path="/visualization" element={<Visualization />} />
+        <Route path="/eyetracking" element={<EyeTracking />} /> 
       </Routes>
     </AnimatePresence>
   );

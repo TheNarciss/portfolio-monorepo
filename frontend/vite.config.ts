@@ -1,8 +1,7 @@
+// vite.config.ts
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import path from "path";
-
-// https://vite.dev/config/
+import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
@@ -16,5 +15,10 @@ export default defineConfig({
       "@assets": path.resolve(__dirname, "src/assets"),
     },
   },
-});
-
+  server: {
+    // équivalent historyApiFallback pour dev server
+    fs: {
+      strict: false, // permet de servir index.html pour SPA
+    },
+  },
+})

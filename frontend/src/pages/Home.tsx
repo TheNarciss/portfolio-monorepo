@@ -13,6 +13,7 @@ const sections = [
   { id: "education", label: "Formations", route: "/education" },
   { id: "skills map", label: "Skills map", route: "/visualization" },
   { id: "chatbot", label: "Chatbot", route: "/chatbot" },
+  { id: "eyetracking", label: "EyeTracking", route: "/eyetracking" },
 ];
 
 const Home: React.FC = () => {
