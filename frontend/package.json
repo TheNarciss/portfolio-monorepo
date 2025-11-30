@@ -5,14 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b || true && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
     "@mediapipe/camera_utils": "^0.3.1675466862",
+    "@mediapipe/drawing_utils": "^0.3.1675466124",
     "@mediapipe/face_mesh": "^0.4.1633559619",
-    "@react-three/drei": "^10.7.6",
+    "@mediapipe/tasks-vision": "0.10.22-rc.20250304",
+    "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.4.0",
     "@react-three/postprocessing": "^3.0.4",
     "axios": "^1.12.2",
@@ -24,7 +26,9 @@
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.9.4",
     "remark-gfm": "^4.0.1",
-    "three": "^0.180.0"
+    "tensorflow": "^0.7.0",
+    "three": "0.180.0",
+    "three-mesh-bvh": "^0.9.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

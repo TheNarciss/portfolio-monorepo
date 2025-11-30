@@ -58,7 +58,7 @@ pip-wheel-metadata/
 *.egg-info/
 dist/
 build/
-
+node_modules
 # Jupyter / notebooks
 .ipynb_checkpoints/
 *.ipynb

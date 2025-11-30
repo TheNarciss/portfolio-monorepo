@@ -38,7 +38,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "3000:4173"  # mappe port interne 4173 → externe 3000
+      - "4173:4173"  # mappe port interne 4173 → externe 4173
     networks:
       - portfolio_net
 
