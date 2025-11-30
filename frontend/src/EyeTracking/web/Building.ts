@@ -361,28 +361,41 @@ export class BuildingScene {
 
     const lerp = 0.1;
 
-    // 1. Mouvement 3D du bâtiment (depth effect) - Déplacement local à l'intérieur du pivot
-    const moveFactorX = 30;
-    const moveFactorZ = 30;
+    // 1. Mouvement 3D de la tour (PIVOTEMENT au lieu de Translation)
+    // On pivote la tour autour de sa base (pivot à 0,0,0) pour révéler les côtés
+    // sans la faire "sortir" de sa position au sol.
 
-    const targetX = -centerX * moveFactorX;
-    const targetZ = -centerY * moveFactorZ;
+    const maxTiltAngle = Math.PI / 4; // 45 degrés max
 
-    this.rectangle.position.x += (targetX - this.rectangle.position.x) * lerp;
-    this.rectangle.position.z += (targetZ - this.rectangle.position.z) * lerp;
+    // Rotation autour de Z (pour le mouvement gauche/droite)
+    // Si centerX > 0 (Regard vers la droite), on pivote vers la gauche (+Z) ?
+    // Non, parallaxe inverse: si on bouge à droite, le sommet (proche) va à gauche relatif à la base.
+    // +Z fait basculer l'axe Y vers -X. C'est correct.
+    const targetRotZ = centerX * maxTiltAngle;
+
+    // Rotation autour de X (pour le mouvement haut/bas)
+    // Si centerY > 0 (Regard vers le bas), le sommet (proche) va vers le haut (-Z en coord world vue de top?)
+    // +X fait basculer l'axe Y vers +Z (bas de l'écran).
+    // Donc on veut l'inverse (-X) pour remonter.
+    const targetRotX = -centerY * maxTiltAngle;
+
+    // Appliquer la rotation au PIVOT (la base reste à 0,0,0)
+    this.pivot.rotation.z += (targetRotZ - this.pivot.rotation.z) * lerp;
+    this.pivot.rotation.x += (targetRotX - this.pivot.rotation.x) * lerp;
 
     // --- Contrôle des facteurs d'effet sur le terminal (ground) ---
-    const rotationFactor = 0.5;
+    const groundRotationFactor = 0.5;
     const groundMoveFactor = 3.0;
     const shiftFactor = 150;
 
-    // Rotation autour de l'axe Y (gauche/droite) - La rotation s'applique au ground, enfant du scenePivot
-    const targetRotY = -centerX * rotationFactor;
-    this.ground.rotation.y += (targetRotY - this.ground.rotation.y) * lerp;
+    // Rotation du terminal sur l'axe Y (gauche/droite) - Mouvement inverse au regard pour effet 3D
+    const targetGroundRotY = -centerX * groundRotationFactor;
+    this.ground.rotation.y += (targetGroundRotY - this.ground.rotation.y) * lerp;
 
-    // Rotation autour de l'axe X (haut/bas)
-    const targetRotX = centerY * rotationFactor * 0.5;
-    this.ground.rotation.x += ((-Math.PI / 2) + targetRotX - this.ground.rotation.x) * lerp;
+    // Rotation du terminal sur l'axe X (haut/bas)
+    const targetGroundRotX = centerY * groundRotationFactor * 0.5;
+    // On ajoute à la rotation de base (-PI/2)
+    this.ground.rotation.x += ((-Math.PI / 2) + targetGroundRotX - this.ground.rotation.x) * lerp;
 
 
     // Translation du plan 3D pour suivre légèrement l'œil (renforce l'effet de perspective)
