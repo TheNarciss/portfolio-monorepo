@@ -6,9 +6,22 @@ export class BuildingScene {
   renderer: THREE.WebGLRenderer;
   rectangle: THREE.Mesh;
   ground: THREE.Mesh;
-  pivot: THREE.Group;
+  pivot: THREE.Group; // Pivot du bâtiment
+  scenePivot: THREE.Group; // Nouveau pivot pour toute la scène (drag and drop)
+
   ambientLight: THREE.AmbientLight;
   dirLight: THREE.DirectionalLight;
+
+  // Propriétés pour le canvas du terminal
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  texture: THREE.CanvasTexture;
+
+  // Propriétés pour le Raycasting / Glissement
+  raycaster: THREE.Raycaster;
+  pointer: THREE.Vector2;
+  isDragging: boolean = false;
+  lastIntersectionPoint: THREE.Vector3 | null = null;
 
   latestEyePos: {
     left: { x: number; y: number };
@@ -18,12 +31,12 @@ export class BuildingScene {
   constructor(container: HTMLElement) {
     // Scene
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x000000); // Noir pour terminal
+    this.scene.background = new THREE.Color(0x000000); // Noir pour background
 
     // Camera - Vue parfaitement perpendiculaire (de dessus à 90°)
     const aspect = container.clientWidth / container.clientHeight;
     this.camera = new THREE.PerspectiveCamera(60, aspect, 0.1, 100);
-    this.camera.position.set(0, 20, 0);
+    this.camera.position.set(0, 30, 0);
     this.camera.lookAt(0, 0, 0);
 
     // Renderer
@@ -31,15 +44,19 @@ export class BuildingScene {
     this.renderer.setSize(container.clientWidth, container.clientHeight);
     container.appendChild(this.renderer.domElement);
 
-    // Pivot pour le rectangle
+    // --- PIVOT PRINCIPAL POUR LE GLISSEMENT ---
+    this.scenePivot = new THREE.Group();
+    this.scene.add(this.scenePivot);
+
+    // Pivot pour le rectangle (bâtiment)
     this.pivot = new THREE.Group();
-    this.scene.add(this.pivot);
+    this.scenePivot.add(this.pivot); // Le bâtiment est enfant du pivot de scène
 
     // Rectangle vertical (tour/building) - Style néon vert
-    const geometry = new THREE.BoxGeometry(2, 5, 2);
+    const geometry = new THREE.BoxGeometry(3, 15, 3);
     const material = new THREE.MeshStandardMaterial({
-      color: 0x00ff88,
-      emissive: 0x00ff88,
+      color: 0x00ff11,
+      emissive: 0x00ff11,
       emissiveIntensity: 0.5,
       metalness: 0.8,
       roughness: 0.2,
@@ -58,9 +75,9 @@ export class BuildingScene {
     this.rectangle.add(wireframe);
 
     // Lignes horizontales pour marquer les étages
-    const numFloors = 5;
+    const numFloors = 50;
     for (let i = 1; i < numFloors; i++) {
-      const floorY = (i * 5) / numFloors - 2.5;
+      const floorY = (i * 15) / numFloors - 7.5;
 
       const floorPoints = [
         new THREE.Vector3(-1, floorY, -1),
@@ -85,85 +102,33 @@ export class BuildingScene {
       this.rectangle.add(floorLine);
     }
 
-    // SOL qui ressemble à une fenêtre Terminal macOS
-    const groundGeometry = new THREE.PlaneGeometry(15, 10);
-    const canvas = document.createElement("canvas");
-    canvas.width = 1024;
-    canvas.height = 682;
-    const ctx = canvas.getContext("2d")!;
+    // --- SOL / FENÊTRE TERMINAL ---
 
-    // Fond noir du terminal
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Création et stockage du canvas
+    this.canvas = document.createElement("canvas");
+    this.canvas.width = 1024;
+    this.canvas.height = 682;
+    this.ctx = this.canvas.getContext("2d")!;
 
-    // Barre de titre macOS en haut
-    ctx.fillStyle = "rgba(40, 40, 40, 0.95)";
-    ctx.fillRect(0, 0, canvas.width, 60);
-
-    // Boutons rouge, jaune, vert
-    const buttonColors = ["#FF5F56", "#FFBD2E", "#27C93F"];
-    buttonColors.forEach((color, i) => {
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.arc(20 + i * 25, 30, 8, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    // Titre "Terminal"
-    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-    ctx.font = "18px -apple-system, BlinkMacSystemFont";
-    ctx.textAlign = "center";
-    ctx.fillText("Terminal — user@mac", canvas.width / 2, 35);
-
-    // Ligne de séparation
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(0, 60);
-    ctx.lineTo(canvas.width, 60);
-    ctx.stroke();
-
-    // Texte terminal vert
-    ctx.fillStyle = "#00ff00";
-    ctx.font = "16px Monaco, monospace";
-    ctx.textAlign = "left";
-    ctx.fillText("user@mac:~$ npm run dev", 20, 100);
-    ctx.fillText("> Starting server...", 20, 130);
-    ctx.fillText("> Server running on port 3000", 20, 160);
-    ctx.fillText("> █", 20, 190);
-
-    // Créer une texture à partir du canvas
-    const texture = new THREE.CanvasTexture(canvas);
+    // Créer la texture
+    this.texture = new THREE.CanvasTexture(this.canvas);
     const groundMaterial = new THREE.MeshBasicMaterial({
-      map: texture,
+      map: this.texture,
       side: THREE.DoubleSide,
+      // La transparence est nécessaire pour que les coins arrondis fonctionnent
+      transparent: true,
+      alphaTest: 0.1 // Petite optimisation pour la transparence
     });
 
+    // Dessiner la texture initiale (sans décalage)
+    this.drawTerminalTexture(0, 0);
+
+    const groundGeometry = new THREE.PlaneGeometry(15, 10);
     this.ground = new THREE.Mesh(groundGeometry, groundMaterial);
     this.ground.rotation.x = -Math.PI / 2;
-    this.ground.position.y = 0;
-    this.scene.add(this.ground);
+    this.ground.position.y = 0.01; // Légèrement au-dessus du sol 3D pour éviter le Z-fighting
+    this.scenePivot.add(this.ground); // Le terminal est enfant du pivot de scène
 
-    // Bordure lumineuse autour de la fenêtre terminal
-    const borderPoints = [
-      new THREE.Vector3(-7.5, 0.01, -5),
-      new THREE.Vector3(7.5, 0.01, -5),
-      new THREE.Vector3(7.5, 0.01, 5),
-      new THREE.Vector3(-7.5, 0.01, 5),
-      new THREE.Vector3(-7.5, 0.01, -5),
-    ];
-    const borderGeometry = new THREE.BufferGeometry().setFromPoints(
-      borderPoints
-    );
-    const borderLine = new THREE.Line(
-      borderGeometry,
-      new THREE.LineBasicMaterial({
-        color: 0x00ff00,
-        linewidth: 3,
-      })
-    );
-    this.scene.add(borderLine);
-    // Interface macOS
     // Lumières
     this.ambientLight = new THREE.AmbientLight(0x00ff44, 0.4);
     this.scene.add(this.ambientLight);
@@ -176,6 +141,15 @@ export class BuildingScene {
     const accentLight = new THREE.PointLight(0x00ff88, 1, 50);
     accentLight.position.set(0, 20, 0);
     this.scene.add(accentLight);
+
+    // --- CONFIGURATION DU GLISSEMENT ---
+    this.raycaster = new THREE.Raycaster();
+    this.pointer = new THREE.Vector2();
+
+    this.renderer.domElement.addEventListener('pointerdown', this.onPointerDown.bind(this));
+    window.addEventListener('pointerup', this.onPointerUp.bind(this));
+    this.renderer.domElement.addEventListener('pointermove', this.onPointerMove.bind(this));
+
     this.createMacOSWindow(container);
 
     // Bouton de log
@@ -184,6 +158,167 @@ export class BuildingScene {
     // Démarrage de l'animation
     this.animate();
   }
+
+  // Fonction utilitaire pour dessiner un rectangle aux coins arrondis
+  drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+    if (w < 2 * r) r = w / 2;
+    if (h < 2 * r) r = h / 2;
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+
+  // Fonction pour dessiner/redessiner le contenu du terminal avec un décalage
+  drawTerminalTexture(offsetX: number, offsetY: number) {
+    const ctx = this.ctx;
+    const canvas = this.canvas;
+    const radius = 20; // Rayon plus petit et fidèle à macOS (20px)
+    const titleBarHeight = 40;
+    const bodyColor = "rgba(40, 40, 40, 0.9)"; // Gris foncé pour le corps
+    const titleBarColor = "rgba(60, 60, 60, 0.9)"; // Gris légèrement plus clair pour la barre de titre
+
+    // 1. Effacer le canvas (rend la zone autour du terminal transparent)
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // === Corps du Terminal (avec coins arrondis) ===
+
+    // Définir le chemin du rectangle arrondi pour le fond
+    this.drawRoundedRect(ctx, 0, 0, canvas.width, canvas.height, radius);
+
+    // Appliquer une légère ombre (simule la profondeur et la bordure claire)
+    ctx.filter = "drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.5))"; // Ombre légère pour le détacher
+    ctx.fillStyle = bodyColor;
+    ctx.fill();
+    ctx.filter = 'none'; // Réinitialiser le filtre
+
+    // Appliquer un masque d'écrêtage pour que tout le contenu reste à l'intérieur des coins arrondis
+    ctx.save();
+    this.drawRoundedRect(ctx, 0, 0, canvas.width, canvas.height, radius);
+    ctx.clip();
+
+
+    // 2. Dessiner la barre de titre
+
+    // Remplir la zone de la barre de titre avec la couleur plus claire
+    ctx.fillStyle = titleBarColor;
+    ctx.fillRect(0, 0, canvas.width, titleBarHeight);
+
+    // Ligne de séparation subtile (pour l'effet d'acrylique/vibrancy)
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, titleBarHeight);
+    ctx.lineTo(canvas.width, titleBarHeight);
+    ctx.stroke();
+
+    // Simulation de dégradé/lumière en haut (effet macOS)
+    const gradient = ctx.createLinearGradient(0, 0, 0, titleBarHeight);
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.05)');
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, titleBarHeight);
+
+    // Boutons rouge, jaune, vert (style macOS) - légèrement plus grands et centrés
+    const buttonColors = ["#FF5F56", "#FFBD2E", "#27C93F"];
+    const buttonRadius = 6;
+    buttonColors.forEach((color, i) => {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(15 + i * 18, titleBarHeight / 2, buttonRadius, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Titre "Terminal"
+    ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+    ctx.font = `14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"`;
+    ctx.textAlign = "center";
+    ctx.fillText("Terminal - zsh", canvas.width / 2, titleBarHeight / 2 + 5);
+
+
+    // 3. Appliquer la translation pour le contenu (Parallax)
+
+    ctx.save();
+    ctx.translate(offsetX, offsetY);
+
+    // Texte terminal vert
+    ctx.fillStyle = "#00ff00"; // Maintien du vert néon pour l'ambiance
+    ctx.font = "16px 'SF Mono', 'Monaco', monospace";
+    ctx.textAlign = "left";
+    ctx.fillText("user@mac:~$ npm run dev", 20, titleBarHeight + 30);
+    ctx.fillText("> Starting server...", 20, titleBarHeight + 60);
+    ctx.fillText("> Server running on port 3000", 20, titleBarHeight + 90);
+    ctx.fillText("> █", 20, titleBarHeight + 120);
+
+    // 4. Rétablir le contexte (annule la translation et l'écrêtage)
+    ctx.restore();
+    ctx.restore(); // Restaurer deux fois (une fois pour le clip, une fois pour la translation)
+
+    this.texture.needsUpdate = true; // Forcer la mise à jour de la texture.
+  }
+
+  // --- LOGIQUE DE GLISSEMENT (DRAG & DROP) ---
+
+  /**
+   * Obtient le point d'intersection 3D entre le rayon de la souris et le plan du sol.
+   * @param event L'événement PointerEvent.
+   * @returns Un THREE.Vector3 du point d'intersection, ou null.
+   */
+  getGroundIntersection(event: PointerEvent): THREE.Vector3 | null {
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    this.pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    this.pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    this.raycaster.setFromCamera(this.pointer, this.camera);
+    // Intersection avec le plan du terminal/sol
+    const intersects = this.raycaster.intersectObject(this.ground, false);
+
+    if (intersects.length > 0) {
+      return intersects[0].point;
+    }
+    return null;
+  }
+
+  onPointerDown(event: PointerEvent) {
+    const intersection = this.getGroundIntersection(event);
+    if (intersection) {
+      this.isDragging = true;
+      // Stocke le point d'intersection 3D initial
+      this.lastIntersectionPoint = intersection.clone();
+    }
+  }
+
+  onPointerUp(event: PointerEvent) {
+    this.isDragging = false;
+    this.lastIntersectionPoint = null;
+  }
+
+  onPointerMove(event: PointerEvent) {
+    // Si l'utilisateur est en mode glissement, déplacer le pivot de scène
+    if (this.isDragging) {
+      const currentIntersection = this.getGroundIntersection(event);
+
+      if (currentIntersection && this.lastIntersectionPoint) {
+        // Calcule la différence entre le point 3D actuel et le point 3D précédent
+        const deltaX = currentIntersection.x - this.lastIntersectionPoint.x;
+        const deltaZ = currentIntersection.z - this.lastIntersectionPoint.z;
+
+        // Applique ce delta à la position du pivot principal
+        this.scenePivot.position.x += deltaX;
+        this.scenePivot.position.z += deltaZ;
+
+        // Met à jour le point d'intersection pour le prochain mouvement
+        this.lastIntersectionPoint.copy(currentIntersection);
+      }
+    }
+  }
+
+  // --- FIN LOGIQUE DE GLISSEMENT ---
+
 
   animate = () => {
     requestAnimationFrame(this.animate);
@@ -224,15 +359,46 @@ export class BuildingScene {
       (Math.sign(centerY) * Math.pow(Math.abs(centerY) * 2, curve)) /
       Math.pow(2, curve);
 
-    const moveFactorX = 20;
-    const moveFactorZ = 20;
+    const lerp = 0.1;
+
+    // 1. Mouvement 3D du bâtiment (depth effect) - Déplacement local à l'intérieur du pivot
+    const moveFactorX = 30;
+    const moveFactorZ = 30;
 
     const targetX = -centerX * moveFactorX;
     const targetZ = -centerY * moveFactorZ;
 
-    const lerp = 0.1;
     this.rectangle.position.x += (targetX - this.rectangle.position.x) * lerp;
     this.rectangle.position.z += (targetZ - this.rectangle.position.z) * lerp;
+
+    // --- Contrôle des facteurs d'effet sur le terminal (ground) ---
+    const rotationFactor = 0.5;
+    const groundMoveFactor = 3.0;
+    const shiftFactor = 150;
+
+    // Rotation autour de l'axe Y (gauche/droite) - La rotation s'applique au ground, enfant du scenePivot
+    const targetRotY = -centerX * rotationFactor;
+    this.ground.rotation.y += (targetRotY - this.ground.rotation.y) * lerp;
+
+    // Rotation autour de l'axe X (haut/bas)
+    const targetRotX = centerY * rotationFactor * 0.5;
+    this.ground.rotation.x += ((-Math.PI / 2) + targetRotX - this.ground.rotation.x) * lerp;
+
+
+    // Translation du plan 3D pour suivre légèrement l'œil (renforce l'effet de perspective)
+    const targetGroundX = -centerX * groundMoveFactor;
+    const targetGroundZ = -centerY * groundMoveFactor;
+
+    this.ground.position.x += (targetGroundX - this.ground.position.x) * lerp;
+    this.ground.position.z += (targetGroundZ - this.ground.position.z) * lerp;
+
+
+    // 2. Décalage 2D du contenu du terminal (perspective on flat surface)
+    const shiftX = -centerX * shiftFactor;
+    const shiftY = -centerY * shiftFactor;
+
+    this.drawTerminalTexture(shiftX, shiftY);
+    this.texture.needsUpdate = true;
   }
 
   createMacOSWindow(container: HTMLElement) {
@@ -303,8 +469,9 @@ export class BuildingScene {
 
     btn.onclick = () => {
       console.log("=== BuildingScene LOG ===");
-      console.log("Rectangle position:", this.rectangle.position);
-      console.log("Pivot rotation:", this.pivot.rotation);
+      console.log("Scene Pivot position:", this.scenePivot.position);
+      console.log("Rectangle (Building) local position:", this.rectangle.position);
+      console.log("Ground (Terminal) local position:", this.ground.position);
       console.log("Camera position:", this.camera.position);
     };
 
