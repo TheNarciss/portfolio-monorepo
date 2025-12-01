@@ -4,7 +4,7 @@ export class BuildingScene {
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
   renderer: THREE.WebGLRenderer;
-  rectangle: THREE.Mesh;
+  rectangle: THREE.Group; // Changé de Mesh à Group pour contenir la structure complexe
   ground: THREE.Mesh;
   pivot: THREE.Group; // Pivot du bâtiment
   scenePivot: THREE.Group; // Nouveau pivot pour toute la scène (drag and drop)
@@ -52,55 +52,60 @@ export class BuildingScene {
     this.pivot = new THREE.Group();
     this.scenePivot.add(this.pivot); // Le bâtiment est enfant du pivot de scène
 
-    // Rectangle vertical (tour/building) - Style néon vert
-    const geometry = new THREE.BoxGeometry(3, 15, 3);
-    const material = new THREE.MeshStandardMaterial({
-      color: 0x00ff11,
-      emissive: 0x00ff11,
-      emissiveIntensity: 0.5,
-      metalness: 0.8,
-      roughness: 0.2,
-    });
-    this.rectangle = new THREE.Mesh(geometry, material);
+    // --- CONSTRUCTION DE LA NOUVELLE TOUR CYBERPUNK ---
+    this.rectangle = new THREE.Group();
     this.rectangle.position.set(0, 2.5, 0);
     this.pivot.add(this.rectangle);
 
-    // Ajouter des lignes horizontales (étages)
-    const edgesGeometry = new THREE.EdgesGeometry(geometry);
-    const edgesMaterial = new THREE.LineBasicMaterial({
-      color: 0x00ffaa,
-      linewidth: 2,
+    // 1. Texture procédurale "Server Rack"
+    const serverTexture = this.generateServerTexture();
+
+    // 2. Le Cœur (Core) - Sombre et réfléchissant avec texture émissive
+    const coreGeometry = new THREE.BoxGeometry(2.8, 15, 2.8);
+    const coreMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0x111111,
+      metalness: 0.9,
+      roughness: 0.2,
+      emissive: 0x00ff00,
+      emissiveMap: serverTexture,
+      emissiveIntensity: 0.8,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.1
     });
-    const wireframe = new THREE.LineSegments(edgesGeometry, edgesMaterial);
-    this.rectangle.add(wireframe);
+    const coreMesh = new THREE.Mesh(coreGeometry, coreMaterial);
+    this.rectangle.add(coreMesh);
 
-    // Lignes horizontales pour marquer les étages
-    const numFloors = 50;
-    for (let i = 1; i < numFloors; i++) {
-      const floorY = (i * 15) / numFloors - 7.5;
+    // 3. L'Armature (Exosquelette) - Néon pur
+    const frameGeometry = new THREE.BoxGeometry(3, 15.1, 3);
+    // On utilise un WireframeGeometry pour avoir des lignes nettes
+    const frameGeo = new THREE.WireframeGeometry(frameGeometry);
+    const frameMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.3 });
+    const frameLines = new THREE.LineSegments(frameGeo, frameMaterial);
+    this.rectangle.add(frameLines);
 
-      const floorPoints = [
-        new THREE.Vector3(-1, floorY, -1),
-        new THREE.Vector3(1, floorY, -1),
-        new THREE.Vector3(1, floorY, 1),
-        new THREE.Vector3(-1, floorY, 1),
-        new THREE.Vector3(-1, floorY, -1),
-      ];
+    // 4. Piliers d'angle Néon (Glow solide aux coins)
+    const pillarGeo = new THREE.BoxGeometry(0.2, 15, 0.2);
+    const pillarMat = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const pillarPositions = [
+      { x: -1.5, z: -1.5 }, { x: 1.5, z: -1.5 },
+      { x: 1.5, z: 1.5 }, { x: -1.5, z: 1.5 }
+    ];
+    pillarPositions.forEach(pos => {
+      const pillar = new THREE.Mesh(pillarGeo, pillarMat);
+      pillar.position.set(pos.x, 0, pos.z);
+      this.rectangle.add(pillar);
+    });
 
-      const floorGeometry = new THREE.BufferGeometry().setFromPoints(
-        floorPoints
-      );
-      const floorLine = new THREE.Line(
-        floorGeometry,
-        new THREE.LineBasicMaterial({
-          color: 0x00ff66,
-          transparent: true,
-          opacity: 0.8,
-        })
-      );
+    // 5. Lumière locale (PointLight) attachée à la tour
+    // Cela permet à la tour d'éclairer le terminal sous elle
+    const towerLight = new THREE.PointLight(0x00ff00, 2, 20);
+    towerLight.position.set(0, -5, 0); // Vers le bas de la tour
+    this.rectangle.add(towerLight);
 
-      this.rectangle.add(floorLine);
-    }
+    // Lumière additionnelle pour le haut de la tour
+    const topLight = new THREE.PointLight(0x00ff00, 1, 10);
+    topLight.position.set(0, 7, 0);
+    this.rectangle.add(topLight);
 
     // --- SOL / FENÊTRE TERMINAL ---
 
@@ -112,12 +117,13 @@ export class BuildingScene {
 
     // Créer la texture
     this.texture = new THREE.CanvasTexture(this.canvas);
-    const groundMaterial = new THREE.MeshBasicMaterial({
+    const groundMaterial = new THREE.MeshStandardMaterial({ // Changé en Standard pour réagir à la lumière de la tour
       map: this.texture,
       side: THREE.DoubleSide,
-      // La transparence est nécessaire pour que les coins arrondis fonctionnent
       transparent: true,
-      alphaTest: 0.1 // Petite optimisation pour la transparence
+      alphaTest: 0.1,
+      roughness: 0.4,
+      metalness: 0.1
     });
 
     // Dessiner la texture initiale (sans décalage)
@@ -130,17 +136,12 @@ export class BuildingScene {
     this.scenePivot.add(this.ground); // Le terminal est enfant du pivot de scène
 
     // Lumières
-    this.ambientLight = new THREE.AmbientLight(0x00ff44, 0.4);
+    this.ambientLight = new THREE.AmbientLight(0x111111, 0.2); // Ambiance plus sombre pour faire ressortir le néon
     this.scene.add(this.ambientLight);
 
-    this.dirLight = new THREE.DirectionalLight(0x00ffaa, 0.8);
+    this.dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
     this.dirLight.position.set(5, 15, 5);
     this.scene.add(this.dirLight);
-
-    // Lumière d'accent verte
-    const accentLight = new THREE.PointLight(0x00ff88, 1, 50);
-    accentLight.position.set(0, 20, 0);
-    this.scene.add(accentLight);
 
     // --- CONFIGURATION DU GLISSEMENT ---
     this.raycaster = new THREE.Raycaster();
@@ -157,6 +158,54 @@ export class BuildingScene {
 
     // Démarrage de l'animation
     this.animate();
+  }
+
+  // Génère une texture procédurale pour simuler des racks de serveurs
+  generateServerTexture(): THREE.CanvasTexture {
+    const width = 64;
+    const height = 256;
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d')!;
+
+    // Fond noir
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, width, height);
+
+    // Grille de lumières
+    const rows = 40;
+    const cols = 4;
+    const cellH = height / rows;
+    const cellW = width / cols;
+
+    for (let y = 0; y < rows; y++) {
+      // Une rangée sur 5 est une séparation sombre
+      if (y % 5 === 0) continue; 
+      
+      for (let x = 0; x < cols; x++) {
+        // Aléatoire pour allumer ou éteindre des "leds"
+        if (Math.random() > 0.3) {
+          // Nuances de vert
+          const intensity = Math.floor(Math.random() * 155) + 100; 
+          ctx.fillStyle = `rgb(0, ${intensity}, 0)`;
+          
+          // Petits rectangles (LEDs)
+          const padding = 2;
+          ctx.fillRect(
+            x * cellW + padding, 
+            y * cellH + padding, 
+            cellW - padding * 2, 
+            cellH - padding * 2
+          );
+        }
+      }
+    }
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.magFilter = THREE.NearestFilter; // Pixel art style crisp
+    texture.minFilter = THREE.LinearFilter;
+    return texture;
   }
 
   // Fonction utilitaire pour dessiner un rectangle aux coins arrondis
@@ -292,7 +341,7 @@ export class BuildingScene {
     }
   }
 
-  onPointerUp(event: PointerEvent) {
+  onPointerUp(_event: PointerEvent) {
     this.isDragging = false;
     this.lastIntersectionPoint = null;
   }
@@ -368,15 +417,9 @@ export class BuildingScene {
     const maxTiltAngle = Math.PI / 4; // 45 degrés max
 
     // Rotation autour de Z (pour le mouvement gauche/droite)
-    // Si centerX > 0 (Regard vers la droite), on pivote vers la gauche (+Z) ?
-    // Non, parallaxe inverse: si on bouge à droite, le sommet (proche) va à gauche relatif à la base.
-    // +Z fait basculer l'axe Y vers -X. C'est correct.
     const targetRotZ = centerX * maxTiltAngle;
 
     // Rotation autour de X (pour le mouvement haut/bas)
-    // Si centerY > 0 (Regard vers le bas), le sommet (proche) va vers le haut (-Z en coord world vue de top?)
-    // +X fait basculer l'axe Y vers +Z (bas de l'écran).
-    // Donc on veut l'inverse (-X) pour remonter.
     const targetRotX = -centerY * maxTiltAngle;
 
     // Appliquer la rotation au PIVOT (la base reste à 0,0,0)

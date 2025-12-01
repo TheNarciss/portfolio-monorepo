@@ -26,7 +26,7 @@ const EducationPage: React.FC = () => {
   if (error) return <p className="text-center mt-fluid-4 text-red-500 text-fluid-base">{error}</p>;
 
   return (
-    <div className="container mx-auto px-fluid-4 py-fluid-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-fluid-4">
+    <div className="container mx-auto px-fluid-4 py-fluid-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-fluid-4 ">
       {educations.map((edu) => (
         <Card
           key={edu.id}

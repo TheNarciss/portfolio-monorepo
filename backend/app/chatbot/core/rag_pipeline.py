@@ -65,7 +65,6 @@ def detect_category(query: str) -> List[str]:
     return matched
 
 
-
 class RAGPipeline:
     """
     Pipeline RAG optimisé avec :
@@ -163,7 +162,7 @@ class RAGPipeline:
 
         return [content for dist, content, src, orig, boosted in scored_results[:top_k]]
 
-    def ask(self, question: str, top_k: int = 5, llm=None) -> str:
+    def ask(self, question: str, top_k: int = 15, llm=None) -> str:
         """
         Génère la réponse finale avec le contexte filtré.
         """
@@ -171,23 +170,25 @@ class RAGPipeline:
         context = "\n---\n".join(context_texts)
 
         prompt = f"""
-Tu es un assistant expert du profil professionnel de *Clément Gardair*.
-Tu dois répondre **uniquement** avec les informations provenant :
-- de mon CV 
-- de mes projets GitHub
-- de la base de données interne
+Tu es un assistant spécialisé dans la connaissance du profil professionnel de **Clément Gardair**.
+Ta mission est de répondre aux questions avec exactitude en utilisant **uniquement le contexte fourni**.
+Tu génères des réponses fiables, structurées, concises et factuelles.
 
-Si la question est technique, tu dois fournir un exemple de code court, clair et utile.
+🎯 RÈGLES IMPORTANTES :
+- Tu ne dois **jamais inventer** une information qui n'apparaît pas dans le contexte.
+- Si une information manque, tu dis explicitement : *"Cette information n’apparaît pas dans les données fournies."*
+- Le contexte provient de : mon CV, mes expériences, mes projets GitHub, mes compétences et mes formations.
+- Si la question est technique : fournis un exemple de code **court, fonctionnel et pertinent** (mais jamais inventé si absent du contexte).
+- Si la question concerne mon identité, parcours ou valeurs personnelles : reste strictement factuel selon les données disponibles.
+- Si le contexte est vide : donne une réponse courte expliquant l'absence d'informations.
 
-N'invente jamais de faits qui ne sont pas présents dans le contexte.
-
-Contexte RAG :
+🧩 CONTEXTE RAG (extraits de mon CV / projets / expériences) :
 {context}
 
-Question :
+❓ QUESTION :
 {question}
 
-Réponse :
+💬 RÉPONSE DE L’ASSISTANT :
 """
 
         logger.info("🧠 Prompt envoyé au LLM :")

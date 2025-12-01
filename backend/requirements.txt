@@ -29,3 +29,4 @@ pytest
 httpx
 
 sentence-transformers 
+faiss-cpu

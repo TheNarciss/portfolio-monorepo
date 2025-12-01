@@ -20,7 +20,7 @@ const Card: React.FC<CardProps> = ({
 }) => {
   return (
     <motion.div
-      className="bg-card border border-[#333] rounded-xl p-fluid-4 flex flex-col shadow-md hover:shadow-xl transition-transform duration-300"
+      className="bg-card border border-[#333] rounded-xl p-fluid-4 flex flex-col shadow-md hover:shadow-xl transition-transform duration-300 w-full max-w-sm"
       whileHover={{ scale: 1.03 }}
     >
       {image_url && (
